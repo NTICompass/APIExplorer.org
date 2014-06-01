@@ -170,7 +170,10 @@ $(function(){
 				$thead = $table.find('thead').html('<tr></tr>'),
 				$tbody = $table.find('tbody').empty(),
 				$tfoot = $table.find('tfoot').empty(),
-				$headTR, $currentTR;
+				$headTR, $currentTR,
+				theFields = $.isArray(fields) ? fields : $main.find(':checkbox.field').map(function(){
+					return this.value;
+				}).get();
 
 			$.each(result, function(index, value){
 				$tbody.append('<tr></tr>');
@@ -178,8 +181,8 @@ $(function(){
 
 				$headTR = $thead.find('tr');
 
-				$.each(fields, function(){
-					if($headTR.children().length < fields.length){
+				$.each(theFields, function(){
+					if($headTR.children().length < theFields.length){
 						$headTR.append('<th>'+fieldNames[this]+'</th>');
 					}
 
