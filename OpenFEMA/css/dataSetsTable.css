@@ -1,0 +1,15 @@
+#pageTitle{
+	margin-top: 45px;
+}
+
+span.smallDescription,span.fullDescription{
+	white-space: pre-line;
+}
+
+#sortOrder,#filterOrder{
+	list-style-type: none;
+}
+
+#sortOrder .delSort, #sortOrder .moveRow,#filterOrder .delFilter, #filterOrder .moveRow{
+	cursor: pointer;
+}
