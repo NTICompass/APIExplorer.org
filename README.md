@@ -9,4 +9,4 @@ I used the CodeIgniter framework for the backend and Twitter Bootstrap for the f
 
 The FEMA API docs are located here: http://www.fema.gov/openfema-api-documentation
 
-I have a live demo of this program running at https://rocket.hazmat.name/OpenFEMA/.  Please don't kill my server's bandwitdh, kthxbai :-)
+I have a live demo of this program running at http://apiexplorer.org/OpenFEMA/ (SSL version coming soon).  Please don't kill my server's bandwitdh, kthxbai :-)
