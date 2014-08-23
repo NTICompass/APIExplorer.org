@@ -1,9 +1,9 @@
 OpenFEMA API Explorer
 =====================
 
-My job at creating an API Explorer for OpenFEMA for #hackforchange.  http://hackforchange.org/challenges/interactive-api-explorer/
+My attempt at creating an API Explorer for OpenFEMA for #hackforchange.  http://hackforchange.org/challenges/interactive-api-explorer/
 
-This created at the National Day of Civic Hacking hackathon at RIT.
+This was created at the National Day of Civic Hacking hackathon at RIT.
 
 I used the CodeIgniter framework for the backend and Twitter Bootstrap for the frontend.  To help me from killing FEMA's servers, I use PHP's APC to cache some of the API calls.  The frontend also uses jQuery, underscore.js, and some other scripts I found when Googling around.
 
