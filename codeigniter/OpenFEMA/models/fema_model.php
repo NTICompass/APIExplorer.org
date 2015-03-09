@@ -27,10 +27,13 @@ class FEMA_Model extends CI_Model{
 		if(is_null($this->dataSets)){
 			$this->dataSets = [];
 
-			foreach(file($this->dataSetsURL) as $x){
-				$set = json_decode($x);
-				$this->dataSets[$set->name] = $set;
-			}
+                        $dataSetsJSON = file_get_contents($this->dataSetsURL);
+                        // Fix FEMA's JSON formatting
+                        $dataSets = json_decode('['.str_replace('}{', '},{', $dataSetsJSON).']');
+
+                        foreach($dataSets as $set){
+                                $this->dataSets[$set->name] = $set;
+                        }
 
 			$this->cache->save('dataSets', $this->dataSets, 600);
 		}
@@ -41,10 +44,12 @@ class FEMA_Model extends CI_Model{
 	function getDataSetFields($dataSet=NULL){
 		if(is_null($this->dataSetsFields)){
 			$this->dataSetsFields = [];
+			
+			$dataSetsFieldsJSON = file_get_contents($this->dataSetsFieldsURL);
+                        // Fix FEMA's JSON formatting
+                        $dataSetsFields = json_decode('['.str_replace('}{', '},{', $dataSetsFieldsJSON).']');
 
-			foreach(file($this->dataSetsFieldsURL) as $x){
-				$fields = json_decode($x);
-
+			foreach($dataSetsFields as $fields){
 				if(!isset($this->dataSetsFields[$fields->openFemaDataSet])){
 					$this->dataSetsFields[$fields->openFemaDataSet] = [];
 				}
