@@ -1,7 +1,12 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-// http://www.fema.gov/openfema-api-documentation
-class FEMA_Model extends CI_Model{
+/**
+ * API Module for OpenFEMA
+ * http://www.fema.gov/openfema-api-documentation
+ */
+class FEMA_Model extends MY_Model{
+	use API_Module;
+
 	// URLs for the JSON metadata
 	private $dataSetsURL = 'http://www.fema.gov/api/open/v1/OpenFemaDataSets.json';
 	private $dataSetsFieldsURL = 'http://www.fema.gov/api/open/v1/OpenFemaDataSetFields.json';
@@ -12,11 +17,24 @@ class FEMA_Model extends CI_Model{
 	private $dataSets;
 	private $dataSetsFields;
 
+	public static $filterFuncs = [
+		'eq' => "%s eq '%s'",
+		'ne' => "%s ne '%s'",
+		'gt' => "%s gt '%s'",
+		'ge' => "%s ge '%s'",
+		'lt' => "%s lt '%s'",
+		'le' => "%s le '%s'",
+		# substringof is (searchString, field)
+		'!substringof' => "substringof('%s', %s)",
+		'endswith' => "endswith(%s, '%s')",
+		'startswith' => "startswith(%s, '%s')",
+		'!not_substringof' => "not substringof('%s', %s)",
+		'not_endswith' => "not endswith(%s, '%s')",
+		'not_startswith' => "not startswith(%s, '%s')"
+	];
+
 	function __construct(){
-		$this->load->driver('cache', [
-			'adapter' => 'apc',
-			'backup' => 'file'
-		]);
+		parent::__construct();
 
 		// Check the cache, this saves us some API/JSON calls
 		$this->dataSets = $this->cache->get('dataSets') ?: NULL;
@@ -27,13 +45,15 @@ class FEMA_Model extends CI_Model{
 		if(is_null($this->dataSets)){
 			$this->dataSets = [];
 
-                        $dataSetsJSON = file_get_contents($this->dataSetsURL);
-                        // Fix FEMA's JSON formatting
-                        $dataSets = json_decode('['.str_replace('}{', '},{', $dataSetsJSON).']');
+			// FEMA doesn't encode this properly, so I need to fix apostrophes
+			// http://www.fileformat.info/info/unicode/char/fffd/index.htm
+			$dataSetsJSON = preg_replace('/\xEF\xBF\xBD/', '\'', file_get_contents($this->dataSetsURL));
+			// Fix FEMA's JSON formatting
+			$dataSets = json_decode('['.str_replace('}{', '},{', $dataSetsJSON).']');
 
-                        foreach($dataSets as $set){
-                                $this->dataSets[$set->name] = $set;
-                        }
+			foreach($dataSets as $set){
+				$this->dataSets[$set->name] = $set;
+			}
 
 			$this->cache->save('dataSets', $this->dataSets, 600);
 		}
@@ -44,8 +64,11 @@ class FEMA_Model extends CI_Model{
 	function getDataSetFields($dataSet=NULL){
 		if(is_null($this->dataSetsFields)){
 			$this->dataSetsFields = [];
-			
-			$dataSetsFieldsJSON = file_get_contents($this->dataSetsFieldsURL);
+
+			// FEMA doesn't encode this properly, so I need to fix apostrophes
+			// http://www.fileformat.info/info/unicode/char/fffd/index.htm
+			$dataSetsFieldsJSON = preg_replace('/\xEF\xBF\xBD/', '\'', file_get_contents($this->dataSetsFieldsURL));
+
                         // Fix FEMA's JSON formatting
                         $dataSetsFields = json_decode('['.str_replace('}{', '},{', $dataSetsFieldsJSON).']');
 

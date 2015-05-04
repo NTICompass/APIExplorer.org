@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>OpenFEMA Data Sets</title>
+		<title><?=$name?> Data Sets</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -10,28 +10,33 @@
 			<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
 			<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css">
 			<link rel="stylesheet" href="//code.jquery.com/ui/1.10.4/themes/overcast/jquery-ui.css">
-			<link rel="stylesheet" href="/OpenFEMA/css/dataSetsTable.css">
+			<link rel="stylesheet" href="/css/dataSetsTable.css">
 
 			<script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
 			<script src="//code.jquery.com/ui/1.10.4/jquery-ui.min.js"></script>
 			<script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.6.0/underscore-min.js"></script>
 			<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 
-			<script src="/OpenFEMA/js/jquery.tablesorter.min.js"></script>
-			<script src="/OpenFEMA/js/ba-linkify.min.js"></script>
+			<script src="/js/jquery.tablesorter.min.js"></script>
+			<script src="/js/ba-linkify.min.js"></script>
 
-			<script src="/OpenFEMA/js/dataSetsTable.js"></script>
+			<script src="/js/dataSetsTable.js"></script>
 		<?php endif; ?>
 	</head>
-	<body data-baseurl="<?=base_url()?>">
+	<body data-baseurl="<?=base_url()?>" data-api="<?=$api_id?>">
 		<div class="container" id="main">
 			<ul class="breadcrumb">
 				<li>
 					<a class="newURL" href="<?=base_url()?>">Home</a>
 				</li>
+				<li><?=$name?></li>
 				<li class="active"><?=$dataSetInfo->name?></li>
 			</ul>
-			<h1>OpenFEMA API Explorer <small><?=$dataSetInfo->title?></small></h1>
+			<h1><?=$name?> API Explorer <small><?=$dataSetInfo->title?></small></h1>
+			<div class="row">
+				<textarea id="generatedQuery" rows="6" class="col-md-12" data-sql='<?=json_encode(['sql'=>$SQL_Query])?>' readonly></textarea>
+			</div>
+			<br/>
 			<div class="row">
 				<span class="col-md-2">
 					<button type="button" class="btn btn-primary" id="run">Run Query</button>
