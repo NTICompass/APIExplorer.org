@@ -1,11 +1,22 @@
 $(function(){
 	var $main = $('#main'),
 		baseURL = $('body').data('baseurl'),
+		api_id = $('body').data('api'),
 		fieldNames;
 
 	function loadURL(url){
-		$main.load(url+'#main', 'nojs=1', function(){
+		$main.load(url+'#main', 'nojs=1', function(fullHTML){
+			// I'd use jQuery's $.parseHTML, but it strips out the <body> tag
+			// I tried $.parseXML, but <meta> isn't valid XML
+			// $.parseXML uses DOMParser, but as text/xml, not text/html
+			var parser = new DOMParser,
+				fullDocument = parser.parseFromString(fullHTML, 'text/html');
+
+			// TODO: Find a better way to get this data from the AJAX call
+			$('body').data('api', api_id=$(fullDocument).find('body').data('api'));
+
 			fixStuff();
+			generateSQL();
 		});
 	}
 
@@ -24,7 +35,10 @@ $(function(){
 		$('#dataSetsTable,#dataSetsFieldsTable').tablesorter();
 
 		$('#sortOrder,#filterOrder').sortable({
-			handle: '.fa-arrows'
+			handle: '.fa-arrows',
+			stop: function(){
+				generateSQL();
+			}
 		});
 
 		$('#results').dialog({
@@ -53,6 +67,61 @@ $(function(){
 		});
 		$dialog.dialog('option', 'width', window.innerWidth-400);
 		$dialog.dialog('widget').css('position', 'fixed');
+	}
+
+	function generateSQL(){
+		var $sql = $('#generatedQuery');
+		if($sql.length){
+			var theQuery = $sql.data('sql').sql,
+				vars = {
+					fields: '*',
+					query: '1',
+					sort: '',
+					offset: '',
+					limit: ''
+				};
+
+			// SELECT
+			if(!$('#checkAll').is(':checked')){
+				vars.fields = $main.find(':checkbox.field:checked').map(function(){
+					return this.value;
+				}).get().join(', ');
+			}
+
+			// WHERE
+			vars.query = $('#filterOrder li').map(function(){
+				var $this = $(this),
+					field = $this.data('filtername'),
+					func = $this.find('select.filterFunc').val(),
+					val = $this.find('input.filterText').val();
+
+				if(func[0] === '!'){
+					func = func.substring(1);
+					return '"'+val+'" '+func+' '+field;
+				}
+				else{
+					return field+' '+func+' "'+val+'"';
+				}
+			}).get().join("\nAND ");
+
+			// ORDER BY
+			vars.sort = $('#sortOrder li').map(function(){
+				var $this = $(this);
+
+				return $this.data('sortname')+' '+$this.find('select').val();
+			}).get().join(', ');
+
+			// OFFSET, LIMIT
+			vars.offset = $('#offset').val();
+			vars.limit = $('#numRows').val();
+
+			// Replace the string with variables
+			$.each(vars, function(key, value){
+				theQuery = theQuery.replace(':'+key+':', value);
+			});
+
+			$sql.text(theQuery);
+		}
 	}
 
 	$(window).on('popstate', function(e){
@@ -102,6 +171,8 @@ $(function(){
 			$('#filterOrder').append('<li data-filtername="'+filterOption+'"><i class="moveRow fa fa-arrows"></i> '+filterName+' '+
 				$this.data('select')+' <input type="text" class="filterText"> <i class="delFilter fa fa-times"></i></li>');
 		}
+
+		generateSQL();
 	});
 
 	$main.on('click', '#addSortOption', function(){
@@ -116,14 +187,20 @@ $(function(){
 			$('#sortOrder').append('<li data-sortname="'+sortOption+'"><i class="moveRow fa fa-arrows"></i> '+sortName+' '+
 				select+' <i class="delSort fa fa-times"></i></li>');
 		}
+
+		generateSQL();
 	});
 
 	$main.on('click', '#sortOrder .delSort,#filterOrder .delFilter', function(){
 		$(this).closest('li').remove();
+
+		generateSQL();
 	});
 
 	$main.on('change', '#checkAll', function(){
 		$main.find(':checkbox.field').prop('checked', this.checked);
+
+		generateSQL();
 	});
 
 	$main.on('change', ':checkbox.field', function(){
@@ -131,6 +208,12 @@ $(function(){
 			checkedFields = $main.find(':checkbox.field:checked').length;
 
 		$('#checkAll').prop('checked', checkedFields === totalFields);
+
+		generateSQL();
+	});
+
+	$main.on('change', '#numRows,#offset,.filterFunc,.filterText', function(){
+		generateSQL();
 	});
 
 	$main.on('click', '#run', function(){
@@ -152,7 +235,7 @@ $(function(){
 				};
 			}).get();
 
-		$.post(baseURL+'main/ajax_queryAPI', {
+		$.post(baseURL+'query/'+api_id+'/ajax_queryAPI', {
 			dataSet: $('#dataSetsFieldsTable').data('dataset'),
 			fields: fields,
 			sort: _.values(sort),
@@ -199,4 +282,5 @@ $(function(){
 	});
 
 	fixStuff();
+	generateSQL();
 });
