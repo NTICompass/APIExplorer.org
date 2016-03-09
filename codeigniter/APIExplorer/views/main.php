@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>API Explorer</title>
+		<title>API Explorer - beta</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -27,7 +27,7 @@
 		</span>
 		<div class="container">
 			<div class="jumbotron">
-				<h1>Welcome to APIExplorer.org</h1>
+				<h1>Welcome to APIExplorer.org <small>beta</small></h1>
 				<p>Please select an API to begin querying!</p>
 			</div>
 			<table class="table table-hover" id="available_apis">
@@ -42,6 +42,9 @@
 						<tr>
 							<td>
 								<a class="newURL" href="<?=site_url('query/'.$api->api_id)?>"><?=$api->name?></a>
+								<?php if(isset($api->siteType) && $api->siteType === 'beta'): ?>
+									<span class="badge">beta</span>
+								<?php endif; ?>
 							</td>
 							<td>
 								<span class="smallDescription"><?=character_limiter($api->description, 150, '&hellip; <a class="small readMore" href="#">[read more]</a>')?></span>

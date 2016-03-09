@@ -14,7 +14,7 @@
 | path to your installation.
 |
 */
-$config['base_url']	= 'https://apiexplorer.org';
+$config['base_url']	= 'http://beta.apiexplorer.org';
 
 /*
 |--------------------------------------------------------------------------
