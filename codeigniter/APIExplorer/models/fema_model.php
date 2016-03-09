@@ -37,8 +37,8 @@ class FEMA_Model extends MY_Model{
 		parent::__construct();
 
 		// Check the cache, this saves us some API/JSON calls
-		$this->dataSets = $this->cache->get('dataSets') ?: NULL;
-		$this->dataSetsFields = $this->cache->get('dataSetsFields') ?: NULL;
+		$this->dataSets = $this->cache->get('dataSets_fema') ?: NULL;
+		$this->dataSetsFields = $this->cache->get('dataSetsFields_fema') ?: NULL;
 	}
 
 	function getDataSets($dataSet=NULL){
@@ -55,7 +55,7 @@ class FEMA_Model extends MY_Model{
 				$this->dataSets[$set->name] = $set;
 			}
 
-			$this->cache->save('dataSets', $this->dataSets, 600);
+			$this->cache->save('dataSets_fema', $this->dataSets, 600);
 		}
 
 		return $dataSet ? $this->dataSets[$dataSet] : $this->dataSets;
@@ -80,7 +80,7 @@ class FEMA_Model extends MY_Model{
 				$this->dataSetsFields[$fields->openFemaDataSet][] = $fields;
 			}
 
-			$this->cache->save('dataSetsFields', $this->dataSetsFields, 600);
+			$this->cache->save('dataSetsFields_fema', $this->dataSetsFields, 600);
 		}
 
 		return $dataSet ? $this->dataSetsFields[$dataSet] : $this->dataSetsFields;
