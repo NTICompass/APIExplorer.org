@@ -7,8 +7,9 @@ class API_Model extends CI_Model{
 	}
 
 	function get_available_apis(){
-		$this->db->select('api_id,name,description')
+		$this->db->select('api_id,name,description,siteType')
 			->from('available_apis')
+			->where_in('siteType', ['beta', 'live'])
 			->order_by('name');
 		$query = $this->db->get();
 
