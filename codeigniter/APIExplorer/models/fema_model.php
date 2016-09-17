@@ -69,8 +69,8 @@ class FEMA_Model extends MY_Model{
 			// http://www.fileformat.info/info/unicode/char/fffd/index.htm
 			$dataSetsFieldsJSON = preg_replace('/\xEF\xBF\xBD/', '\'', file_get_contents($this->dataSetsFieldsURL));
 
-                        // Fix FEMA's JSON formatting
-                        $dataSetsFields = json_decode('['.str_replace('}{', '},{', $dataSetsFieldsJSON).']');
+			// Fix FEMA's JSON formatting
+			$dataSetsFields = json_decode('['.str_replace('}{', '},{', $dataSetsFieldsJSON).']');
 
 			foreach($dataSetsFields as $fields){
 				if(!isset($this->dataSetsFields[$fields->openFemaDataSet])){
