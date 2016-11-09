@@ -24,4 +24,16 @@ class API_Model extends CI_Model{
 
 		return $query->num_rows() === 1 ? $query->row() : NULL;
 	}
+
+	function get_api_key($api_id){
+		$this->db->select('api_key')
+			->from('api_keys')
+			->where([
+				'api_id' => $api_id,
+				'active' => 1
+			]);
+		$query = $this->db->get();
+
+		return $query->num_rows() === 1 ? $query->row()->api_key : NULL;
+	}
 }

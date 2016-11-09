@@ -17,6 +17,7 @@ class FEMA_Model extends MY_Model{
 	private $dataSets;
 	private $dataSetsFields;
 
+	public static $filterArray = FALSE;
 	public static $filterFuncs = [
 		'eq' => "%s eq '%s'",
 		'ne' => "%s ne '%s'",

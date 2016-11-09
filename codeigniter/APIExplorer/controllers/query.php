@@ -111,21 +111,28 @@ class Query extends CI_Controller {
 				// $this->model::$filterFuncs is a syntax error
 				$loadedAPI = $this->model;
 				$filterFuncs = $loadedAPI::$filterFuncs;
+				$filterArray = $loadedAPI::$filterArray;
 
 				foreach($filters as $filterInfo){
 					$function = $filterFuncs[$filterInfo['func']];
 
 					// If it starts with a "!", that means the parameters are reversed
 					if($filterInfo['func'][0] === '!'){
-						$filterCommand[] = sprintf($function, $filterInfo['val'], $filterInfo['field']);
+						$filterCommand[] = is_callable($function)
+							? $function($filterInfo['val'], $filterInfo['field'])
+							: sprintf($function, $filterInfo['val'], $filterInfo['field']);
 					}
 					// Otherwise it's "field", "value"
 					else{
-						$filterCommand[] = sprintf($function, $filterInfo['field'], $filterInfo['val']);
+						$filterCommand[] = is_callable($function)
+							? $function($filterInfo['field'], $filterInfo['val'])
+							: sprintf($function, $filterInfo['field'], $filterInfo['val']);
 					}
 				}
 
-				$filterCommand = implode(' and ', $filterCommand);
+				if(!$filterArray){
+					$filterCommand = implode(' and ', $filterCommand);
+				}
 			}
 
 			$data = $this->{$this->model}->queryAPI($dataSet, [
